@@ -23,30 +23,28 @@ THE SOFTWARE.
 */
 
 import { createContext } from "react";
-import type { ActionContext, Setter } from "../common/types";
+import type { ActionContext, Setter, Step, Steps } from "../common/types";
 
 function notImplemented() {
   throw Error("Step context not initialized");
 }
 
 export interface IStepsContext {
-  actions: ActionContext[][];
+  steps: Steps;
+  setSteps: Setter<Steps>;
   onDeleteAction: (stepIndex: number, actionIndex: number) => void;
   onInsertAction: (
     action: ActionContext,
     stepIndex: number,
     actionIndex: number
   ) => void;
-  onStepDetailChange: (step: ActionContext[], stepIndex: number) => void;
-  setActions: Setter<ActionContext[][]>;
+  onStepDetailChange: (step: Step, stepIndex: number) => void;
 }
 
 export const StepsContext = createContext<IStepsContext>({
-  actions: [],
+  steps: [],
+  setSteps: notImplemented,
   onDeleteAction: notImplemented,
-  onInsertAction: (_action, _stepIndex, _actionIndex) => {
-    throw Error("not implemented");
-  },
+  onInsertAction: notImplemented,
   onStepDetailChange: notImplemented,
-  setActions: notImplemented,
 });

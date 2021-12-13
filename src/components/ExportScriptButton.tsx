@@ -30,9 +30,9 @@ import { StepsContext } from "../contexts/StepsContext";
 const { ipcRenderer: ipc } = window.require("electron-better-ipc");
 
 export function SaveCodeButton() {
-  const { actions } = useContext(StepsContext);
+  const { steps } = useContext(StepsContext);
   const onSave = async () => {
-    const codeFromActions = await getCodeFromActions(actions, "inline");
+    const codeFromActions = await getCodeFromActions(steps, "inline");
     await ipc.callMain("save-file", codeFromActions);
   };
   return (

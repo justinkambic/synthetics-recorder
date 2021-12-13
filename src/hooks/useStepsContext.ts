@@ -22,37 +22,42 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-import { useCallback, useState } from "react";
-import { getCodeForResult, getCodeFromActions } from "../common/shared";
-import { Result, Steps } from "../common/types";
+import { useState } from "react";
+import { Step, Steps } from "../common/types";
+import { IStepsContext } from "../contexts/StepsContext";
 
-const { ipcRenderer: ipc } = window.require("electron-better-ipc");
-
-export function useSyntheticsTest(actions: Steps) {
-  const [result, setResult] = useState<Result | undefined>(undefined);
-  const [codeBlocks, setCodeBlocks] = useState("");
-
-  const onTest = useCallback(
-    async function () {
-      /**
-       * For the time being we are only running tests as inline.
-       */
-      const code = await getCodeFromActions(actions, "inline");
-      const resultFromServer: Result = await ipc.callMain("run-journey", {
-        code,
-        isSuite: false,
-      });
-
-      setCodeBlocks(await getCodeForResult(actions, result?.journey));
-      setResult(resultFromServer);
-    },
-    [actions, result]
-  );
+export function useStepsContext(): IStepsContext {
+  const [steps, setSteps] = useState<Steps>([]);
   return {
-    codeBlocks,
-    result,
-    onTest,
-    setCodeBlocks,
-    setResult,
+    steps,
+    setSteps,
+    onDeleteAction: (targetStepIdx, actionToDeleteIdx) => {
+      setSteps(steps =>
+        steps.map((step, currentStepIndex) => {
+          if (currentStepIndex !== targetStepIdx) return step;
+
+          step.splice(actionToDeleteIdx, 1);
+
+          return [...step];
+        })
+      );
+    },
+    onInsertAction: (action, targetStepIdx, indexToInsert) => {
+      setSteps(
+        steps.map((step, currentStepIndex) => {
+          if (currentStepIndex !== targetStepIdx) return step;
+
+          step.splice(indexToInsert, 0, action);
+
+          return [...step];
+        })
+      );
+    },
+    onStepDetailChange: (step: Step, stepIndex: number) => {
+      const newActions = steps.map((a, ind) => {
+        return ind === stepIndex ? step : a;
+      });
+      setSteps(newActions);
+    },
   };
 }

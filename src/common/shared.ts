@@ -23,7 +23,13 @@ THE SOFTWARE.
 */
 
 import React from "react";
-import type { ActionContext, Journey, JourneyType, Setter } from "./types";
+import type {
+  ActionContext,
+  Journey,
+  JourneyType,
+  Setter,
+  Steps,
+} from "./types";
 
 const { ipcRenderer: ipc } = window.require("electron-better-ipc");
 
@@ -79,10 +85,7 @@ export function performSelectorLookup(
   };
 }
 
-export async function getCodeFromActions(
-  actions: ActionContext[][],
-  type: JourneyType
-) {
+export async function getCodeFromActions(actions: Steps, type: JourneyType) {
   return await ipc.callMain("actions-to-code", {
     actions: actions.flat(),
     isSuite: type === "suite",
@@ -99,11 +102,11 @@ export function createExternalLinkHandler(
 }
 
 export function updateAction(
-  steps: ActionContext[][],
+  steps: Steps,
   value: string,
   stepIndex: number,
   actionIndex: number
-): ActionContext[][] {
+): Steps {
   return steps.map((step, sidx) => {
     if (sidx !== stepIndex) return step;
     return step.map((ac, aidx) => {
