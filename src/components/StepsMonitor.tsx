@@ -87,12 +87,7 @@ interface ICodeFlyout {
   setIsFlyoutVisible: Setter<boolean>;
 }
 
-function CodeFlyout({
-  steps,
-  code,
-  setCode,
-  setIsFlyoutVisible,
-}: ICodeFlyout) {
+function CodeFlyout({ steps, code, setCode, setIsFlyoutVisible }: ICodeFlyout) {
   const [type, setType] = useState<JourneyType>("inline");
   useEffect(() => {
     (async function getCode() {
