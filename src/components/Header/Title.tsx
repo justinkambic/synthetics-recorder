@@ -39,6 +39,7 @@ import {
 
 export function Title() {
   const { euiTheme } = useEuiTheme();
+
   return (
     <EuiPageHeader
       style={{

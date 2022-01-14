@@ -45,9 +45,11 @@ import { useSyntheticsTest } from "./hooks/useSyntheticsTest";
 import { generateIR, generateMergedIR } from "./helpers/generator";
 import { StepSeparator } from "./components/StepSeparator";
 
-import "@elastic/eui/dist/eui_theme_amsterdam_light.css";
+import "@elastic/eui/dist/eui_theme_light.json";
 import "./App.css";
 import { useStepsContext } from "./hooks/useStepsContext";
+import { CodeFlyout } from "./components/StepsMonitor";
+import { TestResult } from "./components/TestResult";
 
 const { ipcRenderer: ipc } = window.require("electron-better-ipc");
 
@@ -56,7 +58,7 @@ export default function App() {
   const [recordingStatus, setRecordingStatus] = useState(
     RecordingStatus.NotRecording
   );
-  const [, setIsCodeFlyoutVisible] = useState(false);
+  const [isCodeFlyoutVisible, setIsCodeFlyoutVisible] = useState(false);
 
   const stepsContextUtils = useStepsContext();
   const { steps, setSteps } = stepsContextUtils;
@@ -127,6 +129,7 @@ export default function App() {
                 {steps.length === 0 && (
                   <EuiEmptyPrompt
                     aria-label="This empty prompt indicates that you have not recorded any journey steps yet."
+                    hasBorder={false}
                     title={<h3>No steps recorded yet</h3>}
                     body={
                       <p>
@@ -164,6 +167,13 @@ export default function App() {
                     <TestResult />
                   </EuiFlexItem>
                 </EuiFlexGroup> */}
+                <TestResult />
+                {isCodeFlyoutVisible && (
+                  <CodeFlyout
+                    steps={steps}
+                    setIsFlyoutVisible={setIsCodeFlyoutVisible}
+                  />
+                )}
               </EuiPageBody>
             </UrlContext.Provider>
           </TestContext.Provider>

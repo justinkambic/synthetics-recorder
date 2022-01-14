@@ -82,12 +82,11 @@ function RecordedCodeTabs({ selectedTab, setSelectedTab }: IRecordedCodeTabs) {
 
 interface ICodeFlyout {
   steps: Steps;
-  code: string;
-  setCode: Setter<string>;
   setIsFlyoutVisible: Setter<boolean>;
 }
 
-function CodeFlyout({ steps, code, setCode, setIsFlyoutVisible }: ICodeFlyout) {
+export function CodeFlyout({ steps, setIsFlyoutVisible }: ICodeFlyout) {
+  const [code, setCode] = useState("");
   const [type, setType] = useState<JourneyType>("inline");
   useEffect(() => {
     (async function getCode() {
@@ -127,7 +126,6 @@ export function StepsMonitor({
   setIsFlyoutVisible,
 }: IStepsMonitor) {
   const { steps } = useContext(StepsContext);
-  const [code, setCode] = useState("");
 
   return (
     <EuiPanel
@@ -140,12 +138,7 @@ export function StepsMonitor({
       <EuiSpacer />
 
       {isFlyoutVisible && (
-        <CodeFlyout
-          steps={steps}
-          code={code}
-          setCode={setCode}
-          setIsFlyoutVisible={setIsFlyoutVisible}
-        />
+        <CodeFlyout steps={steps} setIsFlyoutVisible={setIsFlyoutVisible} />
       )}
     </EuiPanel>
   );
