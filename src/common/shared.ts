@@ -85,7 +85,10 @@ export function performSelectorLookup(
   };
 }
 
-export async function getCodeFromActions(actions: Steps, type: JourneyType) {
+export async function getCodeFromActions(
+  actions: Steps,
+  type: JourneyType
+): Promise<string> {
   return await ipc.callMain("actions-to-code", {
     actions: actions.flat(),
     isSuite: type === "suite",
