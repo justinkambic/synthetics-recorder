@@ -132,3 +132,8 @@ export async function getCodeForResult(
     journey.type
   );
 }
+
+export enum Routes {
+  landing = "/",
+  main = "/main",
+}
