@@ -44,7 +44,7 @@ export function LandingPage({ url, setUrl }: ILandingPage) {
       <input
         id="landing-page-url-input"
         type="text"
-        placeholder="Enter your URL"
+        placeholder="Enter URL to test"
         onChange={e => setUrl(e.target.value)}
       />
       <button
@@ -56,7 +56,7 @@ export function LandingPage({ url, setUrl }: ILandingPage) {
           navigate(Routes.main);
         }}
       >
-        Start recording!
+        Start recording
       </button>
     </EuiPageBody>
   );
