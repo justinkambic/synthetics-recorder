@@ -42,10 +42,11 @@ import type {
   JourneyStep,
   Result,
   ResultCategory,
+  StepStatus,
 } from "../common/types";
 import { TestContext } from "../contexts/TestContext";
 
-const symbols: Record<ResultCategory, JSX.Element> = {
+const symbols: Record<StepStatus, JSX.Element> = {
   succeeded: <EuiIcon color="success" type="check" />,
   failed: <EuiIcon color="danger" type="alert" />,
   skipped: <EuiIcon color="warning" type="flag" />,

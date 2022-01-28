@@ -23,36 +23,68 @@ THE SOFTWARE.
 */
 
 import { IpcRendererEvent } from "electron";
-import { useCallback, useState } from "react";
+import { RendererProcessIpc } from "electron-better-ipc";
+import { useCallback, useEffect, useReducer, useState } from "react";
 import { getCodeForResult, getCodeFromActions } from "../common/shared";
 import { ActionContext, Result, TestEvent } from "../common/types";
+import { ITestContext } from "../contexts/TestContext";
+import { resultReducer } from "../helpers/resultReducer";
 
-const { ipcRenderer: ipc } = window.require("electron-better-ipc");
+const { ipcRenderer } = window.require("electron-better-ipc");
+const ipc: RendererProcessIpc = ipcRenderer;
 
-export function useSyntheticsTest(actions: ActionContext[][]) {
-  const [result, setResult] = useState<Result | undefined>(undefined);
+export function useSyntheticsTest(actions: ActionContext[][]): ITestContext {
+  const [result, dispatch] = useReducer(resultReducer, undefined);
   const [codeBlocks, setCodeBlocks] = useState("");
-  const onTestEvent = (_event: IpcRendererEvent, data: TestEvent) => {
-    //TODO: display the data
-    console.log(data);
-  };
+  const [isTestRunning, setIsTestRunning] = useState(false);
+
   const onTest = useCallback(
     async function () {
-      /**
-       * For the time being we are only running tests as inline.
-       */
       const code = await getCodeFromActions(actions, "inline");
-      ipc.on("test-event", onTestEvent);
-      const resultFromServer: Result = await ipc.callMain("run-journey", {
-        code,
-        isSuite: false,
-      });
-      ipc.removeListener("test-event", onTestEvent);
-      // setCodeBlocks(await getCodeForResult(actions, result?.journey));
-      // setResult(resultFromServer);
+      if (!isTestRunning) {
+        const onTestEvent = (_event: IpcRendererEvent, data: TestEvent) => {
+          dispatch(data);
+        };
+
+        ipc.on("test-event", onTestEvent);
+
+        try {
+          const promise = ipc.callMain("run-journey", {
+            code,
+            isSuite: false,
+          });
+          setIsTestRunning(true);
+          await promise;
+        } catch (e: unknown) {
+          // eslint-disable-next-line no-console
+          console.error(e);
+        } finally {
+          ipc.removeListener("test-event", onTestEvent);
+          setIsTestRunning(false);
+        }
+      }
     },
-    [actions, result]
+    [actions, isTestRunning]
   );
+
+  useEffect(() => {
+    getCodeForResult(actions, result?.journey).then(code =>
+      setCodeBlocks(code)
+    );
+  }, [actions, result?.journey]);
+
+  /**
+   * This is needed to satisfy some tech debt where we reference a function by this
+   * name elsewhere in the application. This functionality is removed by a downstream branch,
+   * when it's merged we can delete this handler.
+   */
+  const setResult = useCallback((data: Result | undefined) => {
+    dispatch({
+      event: "override",
+      data,
+    });
+  }, []);
+
   return {
     codeBlocks,
     result,

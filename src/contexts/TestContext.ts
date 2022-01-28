@@ -32,12 +32,12 @@ async function notImplementedAsync() {
   notImplemented();
 }
 
-interface ITestContext {
+export interface ITestContext {
   codeBlocks: string;
   onTest: () => Promise<void>;
   result?: Result;
   setCodeBlocks: Setter<string>;
-  setResult: Setter<Result | undefined>;
+  setResult: (data: Result | undefined) => void;
 }
 
 export const TestContext = createContext<ITestContext>({
