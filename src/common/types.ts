@@ -59,7 +59,7 @@ export interface Result {
 }
 
 export interface Journey {
-  status: string; //TODO: define type? e.g. "create"
+  status: string;
   steps: Array<JourneyStep>;
   type: JourneyType;
 }
