@@ -23,24 +23,28 @@ THE SOFTWARE.
 */
 
 import { IpcRendererEvent } from "electron";
-import { RendererProcessIpc } from "electron-better-ipc";
-import { useCallback, useEffect, useReducer, useState } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useReducer,
+  useState,
+} from "react";
 import { getCodeForResult, getCodeFromActions } from "../common/shared";
 import { ActionContext, Result, TestEvent } from "../common/types";
+import { CommunicationContext } from "../contexts/CommunicationContext";
 import { ITestContext } from "../contexts/TestContext";
 import { resultReducer } from "../helpers/resultReducer";
-
-const { ipcRenderer } = window.require("electron-better-ipc");
-const ipc: RendererProcessIpc = ipcRenderer;
 
 export function useSyntheticsTest(actions: ActionContext[][]): ITestContext {
   const [result, dispatch] = useReducer(resultReducer, undefined);
   const [codeBlocks, setCodeBlocks] = useState("");
   const [isTestRunning, setIsTestRunning] = useState(false);
+  const { ipc } = useContext(CommunicationContext);
 
   const onTest = useCallback(
     async function () {
-      const code = await getCodeFromActions(actions, "inline");
+      const code = await getCodeFromActions(ipc, actions, "inline");
       if (!isTestRunning) {
         const onTestEvent = (_event: IpcRendererEvent, data: TestEvent) => {
           dispatch(data);
@@ -64,14 +68,14 @@ export function useSyntheticsTest(actions: ActionContext[][]): ITestContext {
         }
       }
     },
-    [actions, isTestRunning]
+    [actions, ipc, isTestRunning]
   );
 
   useEffect(() => {
-    getCodeForResult(actions, result?.journey).then(code =>
+    getCodeForResult(ipc, actions, result?.journey).then(code =>
       setCodeBlocks(code)
     );
-  }, [actions, result?.journey]);
+  }, [actions, ipc, result?.journey]);
 
   /**
    * This is needed to satisfy some tech debt where we reference a function by this
