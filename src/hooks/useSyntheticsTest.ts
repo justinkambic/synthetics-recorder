@@ -30,7 +30,7 @@ import {
   useReducer,
   useState,
 } from "react";
-import { getCodeForResult, getCodeFromActions } from "../common/shared";
+import { getCodeForFailedResult, getCodeFromActions } from "../common/shared";
 import { ActionContext, Result, TestEvent } from "../common/types";
 import { CommunicationContext } from "../contexts/CommunicationContext";
 import { ITestContext } from "../contexts/TestContext";
@@ -72,9 +72,11 @@ export function useSyntheticsTest(actions: ActionContext[][]): ITestContext {
   );
 
   useEffect(() => {
-    getCodeForResult(ipc, actions, result?.journey).then(code =>
-      setCodeBlocks(code)
-    );
+    if (result?.journey.status === "failed") {
+      getCodeForFailedResult(ipc, actions, result?.journey).then(code =>
+        setCodeBlocks(code)
+      );
+    }
   }, [actions, ipc, result?.journey]);
 
   /**
