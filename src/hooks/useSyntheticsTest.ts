@@ -46,6 +46,8 @@ export function useSyntheticsTest(actions: ActionContext[][]): ITestContext {
     async function () {
       const code = await getCodeFromActions(ipc, actions, "inline");
       if (!isTestRunning) {
+        // destroy stale state
+        dispatch({ data: undefined, event: "override" });
         const onTestEvent = (_event: IpcRendererEvent, data: TestEvent) => {
           dispatch(data);
         };
