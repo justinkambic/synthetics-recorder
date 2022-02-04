@@ -24,10 +24,14 @@ THE SOFTWARE.
 
 import { ElectronServiceFactory, env } from "../services";
 
-const electronService = new ElectronServiceFactory();
+let electronService: ElectronServiceFactory;
 
-afterEach(() => {
-  electronService.terminate();
+beforeEach(() => {
+  electronService = new ElectronServiceFactory();
+});
+
+afterEach(async () => {
+  await electronService.terminate();
 });
 
 describe("Navigation", () => {
