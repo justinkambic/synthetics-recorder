@@ -46,7 +46,8 @@
     "files": [
       "build/**/*",
       "scripts/**/*",
-      "node_modules/**/*"
+      "node_modules/**/*",
+      "entitlements.mac.plist"
     ],
     "extraResources": [
       "local-browsers/**/*"
@@ -55,11 +56,20 @@
     "publish": {
       "provider": "github"
     },
+    "afterSign": "scripts/notarize.js",
     "extraMetadata": {
       "main": "build/electron.js"
     },
+    "dmg": {
+      "sign": false
+    },
     "mac": {
-      "icon": "public/elastic.png"
+      "icon": "public/elastic.png",
+      "entitlements": "entitlements.mac.plist",
+      "entitlementsInherit": "entitlements.mac.plist",
+      "gatekeeperAssess": false,
+      "hardenedRuntime": true,
+      "provisioningProfile": "Synthetics_Recorder.provisionprofile"
     },
     "win": {
       "target": "nsis",
@@ -81,6 +91,7 @@
     "concurrently": "^6.2.0",
     "electron": "^14.0.1",
     "electron-builder": "^22.11.7",
+    "electron-notarize": "^1.1.1",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-formatter-multiple": "^1.0.0",
