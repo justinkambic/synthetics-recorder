@@ -301,6 +301,20 @@ async function onLinkExternal(url) {
   }
 }
 
+async function onMiniWindow(steps) {
+  const float = new BrowserWindow({
+    width: 80,
+    height: 60,
+    minHeight: 60,
+    minWidth: 80,
+    webPreferences: {
+      contextIsolation: false,
+    },
+    alwaysOnTop: true,
+  });
+  float.showInactive();
+}
+
 function setupListeners() {
   ipc.answerRenderer('record-journey', recordJourneys);
   ipc.answerRenderer('run-journey', onTest);
@@ -308,6 +322,7 @@ function setupListeners() {
   ipc.answerRenderer('actions-to-code', onTransformCode);
   ipc.answerRenderer('set-mode', onSetMode);
   ipc.answerRenderer('link-to-external', onLinkExternal);
+  ipc.answerRenderer('mini-window', onMiniWindow);
 }
 
 module.exports = setupListeners;
