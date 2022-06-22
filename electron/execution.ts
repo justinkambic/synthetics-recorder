@@ -123,6 +123,8 @@ function onRecordJourneys(mainWindowEmitter: EventEmitter) {
       actionListener.on('actions', actionsHandler);
 
       const handleMainClose = () => {
+        console.log('hi hi hi');
+        // console.log('the arg', arg);
         actionListener.removeAllListeners();
         ipc.removeListener('stop', closeBrowser);
         browser.close().catch(() => {
@@ -130,6 +132,7 @@ function onRecordJourneys(mainWindowEmitter: EventEmitter) {
         });
       };
 
+      console.log('listener added');
       mainWindowEmitter.addListener(MainWindowEvent.MAIN_CLOSE, handleMainClose);
 
       // _enableRecorder is private method, not defined in BrowserContext type
@@ -377,6 +380,22 @@ async function onSetMode(mode: string) {
   return selector;
 }
 
+// create another handler here to process the renderer's decision of whether to
+// close the window or do nothing. This handler needs access to a function to kill
+// the main window process. We might need to set a flag that we have received
+// confirmation from the user to kill the window, because a subsequent `close` event may fire.
+// We could avoid this by deleting the existing listener in the main thread before we destroy the window.
+
+// callRenderer to inform React code the window will close
+function onCloseHandler(mainWindowEmitter: EventEmitter) {
+  mainWindowEmitter.on(MainWindowEvent.MAIN_CLOSE, e => {
+    console.log('the arg', e.toString());
+  });
+  return async function (data: string, browserWindow: BrowserWindow) {
+    console.log('called ');
+  };
+}
+
 async function onLinkExternal(url: string) {
   try {
     await shell.openExternal(url);
@@ -402,5 +421,6 @@ export default function setupListeners(mainWindowEmitter: EventEmitter) {
     ipc.answerRenderer<string>('save-file', onFileSave),
     ipc.answerRenderer<string>('set-mode', onSetMode),
     ipc.answerRenderer<string>('link-to-external', onLinkExternal),
+    ipc.answerRenderer<string>('notify-on-close', onCloseHandler(mainWindowEmitter)),
   ];
 }

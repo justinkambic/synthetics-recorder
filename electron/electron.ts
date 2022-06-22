@@ -64,8 +64,21 @@ async function createWindow() {
   } else {
     win.loadFile(join(BUILD_DIR, 'index.html'));
   }
-  win.on('close', () => {
-    mainWindowEmitter.emit(MainWindowEvent.MAIN_CLOSE);
+  win.on('close', e => {
+    e.preventDefault();
+    // const choice = require('electron').dialog.showMessageBoxSync(this, {
+    //   type: 'question',
+    //   buttons: ['Yes', 'No'],
+    //   title: 'Confirm',
+    //   message: 'Are you sure you want to quit?',
+    // });
+    // if (choice === 1) {
+    //   e.preventDefault();
+    // }
+    console.log('close!!');
+    mainWindowEmitter.emit(MainWindowEvent.MAIN_CLOSE, () => {
+      win.destroy();
+    });
   });
   win.on('closed', () => {
     mainWindowEmitter.removeAllListeners();
